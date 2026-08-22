@@ -110,27 +110,12 @@
 
 /* ---- default hero slides (used if site-data.js has none) ---- */
 var DEFAULT_SLIDES = [
-  {
-    eyebrow: "Total Water & Environment Management · Since 2019",
-    title: 'Refreshing industry with <span class="accent">clean, reusable water.</span>',
-    subtitle: "Complete water and wastewater treatment plants — from softening and RO to ETP, STP and zero-liquid-discharge recycling.",
-    button: "Know More", link: "services.html",
-    image: "prod-ro.jpg"
-  },
-  {
-    eyebrow: "24×7 Service & Support",
-    title: 'Turnkey plants, <span class="accent">expertly serviced.</span>',
-    subtitle: "Design, installation, commissioning, AMC and on-site support — one accountable team for the life of your plant.",
-    button: "Our Services", link: "services.html",
-    bg: "linear-gradient(115deg,#12365f,#12B5CB)"
-  },
-  {
-    eyebrow: "Adding value across sectors",
-    title: 'Solutions for <span class="accent">industry, homes & communities.</span>',
-    subtitle: "360° water and wastewater treatment for factories, institutions, residential complexes and townships.",
-    button: "Get a Quote", link: "contact.html",
-    bg: "linear-gradient(115deg,#0A2540,#2AA0C4)"
-  }
+  { eyebrow:"Industrial & Commercial", title:'Industrial &amp; Commercial <span class="accent">RO Plants</span>', subtitle:"High-capacity reverse osmosis for consistent, low-TDS process and drinking water.", button:"View Services", link:"services.html", image:"prod-ro.jpg", bg:"linear-gradient(115deg,#0A2540,#1E4F9E)" },
+  { eyebrow:"Water Softening & Filtration", title:'Complete <span class="accent">Water Treatment Plants</span>', subtitle:"Softeners, multigrade and carbon filters that protect your equipment from scale.", button:"View Services", link:"services.html", image:"prod-softener.jpg", bg:"linear-gradient(115deg,#0d2a4d,#155e8a)" },
+  { eyebrow:"Effluent Treatment", title:'ETP — <span class="accent">Effluent Treatment Plants</span>', subtitle:"Bring industrial wastewater within pollution-control discharge norms.", button:"View Services", link:"services.html", image:"prod-etp.jpg", bg:"linear-gradient(115deg,#10233f,#1b4f9e)" },
+  { eyebrow:"Sewage Treatment", title:'STP — <span class="accent">Sewage Treatment Plants</span>', subtitle:"Compact sewage treatment for buildings, townships and industry.", button:"View Services", link:"services.html", image:"prod-stp.jpg", bg:"linear-gradient(115deg,#0A2540,#12557f)" },
+  { eyebrow:"Ultrafiltration", title:'UF — <span class="accent">Ultrafiltration Plants</span>', subtitle:"Chemical-free removal of turbidity, bacteria and suspended solids.", button:"View Services", link:"services.html", image:"prod-uf.jpg", bg:"linear-gradient(115deg,#12365f,#1C74B8)" },
+  { eyebrow:"Demineralisation", title:'DM — <span class="accent">Demineralisation Plants</span>', subtitle:"High-purity, low-conductivity water for boilers, labs and process use.", button:"View Services", link:"services.html", image:"prod-dm.jpg", bg:"linear-gradient(115deg,#0A2540,#164a86)" }
 ];
 
 /* ---- hero slider ---- */
@@ -145,16 +130,21 @@ var DEFAULT_SLIDES = [
 
   var html = "";
   slides.forEach(function (s, i) {
-    var bg = s.image ? ("url('" + s.image + "')") : (s.bg || "linear-gradient(115deg,#0A2540,#1E4F9E)");
-    html += '<div class="hslide' + (i === 0 ? ' active' : '') + '" style="background-image:' + bg + '">'
-      + '<div class="container">'
+    var bg = s.bg || "linear-gradient(115deg,#0A2540,#1E4F9E)";
+    var isSplit = !!s.image;
+    var text = ''
       + (s.eyebrow ? '<span class="eyebrow">' + s.eyebrow + '</span>' : '')
       + '<h1>' + (s.title || '') + '</h1>'
       + (s.subtitle ? '<p class="lead">' + s.subtitle + '</p>' : '')
       + '<div class="hero-actions">'
       + '<a href="' + (s.link || 'services.html') + '" class="btn btn-primary">' + (s.button || 'Know More') + ' ' + arrow + '</a>'
       + '<a href="contact.html" class="btn btn-ghost">Get a Free Quote</a>'
-      + '</div></div></div>';
+      + '</div>';
+    var inner = isSplit
+      ? '<div class="container hs-split"><div class="hs-text">' + text + '</div>'
+        + '<div class="hs-media"><img src="' + s.image + '" alt="" loading="lazy"></div></div>'
+      : '<div class="container">' + text + '</div>';
+    html += '<div class="hslide' + (i === 0 ? ' active' : '') + '" style="background-image:' + bg + '">' + inner + '</div>';
   });
   if (slides.length > 1) {
     html += '<button class="hs-arrow prev" aria-label="Previous">\u2039</button>';

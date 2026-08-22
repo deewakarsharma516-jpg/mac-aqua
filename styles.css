@@ -829,3 +829,20 @@ h1, h2, h3, h4 {
 .svc-media.has-img.cover img { object-fit: cover; padding: 0; }
 .gallery-item.contain { background: #fff; }
 .gallery-item.contain img { object-fit: contain; padding: 8px; }
+
+/* ---- hero slider: split layout (text + product photo) ---- */
+.hslide .container.hs-split {
+  display: grid; grid-template-columns: 1.05fr .95fr; gap: 44px; align-items: center;
+}
+.hs-media {
+  justify-self: end; width: 100%; max-width: 470px;
+  background: #fff; border-radius: 18px; padding: 14px;
+  box-shadow: 0 30px 70px rgba(0,0,0,.38);
+}
+.hs-media img { width: 100%; height: 340px; object-fit: contain; display: block; border-radius: 10px; background: #fff; }
+@media (max-width: 940px) {
+  .hslide .container.hs-split { grid-template-columns: 1fr; gap: 26px; }
+  .hs-media { justify-self: start; max-width: 420px; }
+  .hs-media img { height: 250px; }
+}
+@media (max-width: 720px) { .hs-media { display: none; } }
