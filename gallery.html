@@ -784,6 +784,63 @@ h1, h2, h3, h4 {
   .hero-stats { gap: 26px; }
 }
 
+/* ==========================================================================
+   HERO SLIDER (rotating) — Ion-Exchange style carousel
+   ========================================================================== */
+.hero-slider { position: relative; min-height: 80vh; overflow: hidden; background: var(--ink); }
+.hslide {
+  position: absolute; inset: 0; display: flex; align-items: center; color: #fff;
+  opacity: 0; visibility: hidden; transition: opacity 1s ease;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+}
+.hslide.active { opacity: 1; visibility: visible; z-index: 1; }
+.hslide::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(112deg, rgba(8,28,50,.90) 6%, rgba(19,58,120,.66) 52%, rgba(18,181,203,.34) 100%);
+}
+.hslide .container { position: relative; z-index: 2; padding-bottom: 40px; }
+.hslide .eyebrow { color: var(--aqua-2); }
+.hslide .eyebrow::before { background: var(--aqua-2); }
+.hslide h1 {
+  color: #fff; font-weight: 800; font-size: clamp(2.3rem, 5.2vw, 3.9rem);
+  max-width: 17ch; margin: 16px 0 18px; letter-spacing: -.015em;
+}
+.hslide h1 .accent { background: linear-gradient(120deg,#fff,var(--aqua-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hslide .lead { color: rgba(255,255,255,.92); font-size: 1.14rem; max-width: 560px; margin-bottom: 30px; }
+.hslide .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.hslide .btn-ghost { color: #fff; border-color: rgba(255,255,255,.45); }
+.hslide .btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,.1); color: #fff; }
+
+.hs-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+  width: 52px; height: 52px; border-radius: 50%; cursor: pointer;
+  background: rgba(255,255,255,.14); border: 1.5px solid rgba(255,255,255,.5); color: #fff;
+  font-size: 1.6rem; line-height: 1; display: grid; place-items: center;
+  transition: background .2s, transform .2s;
+}
+.hs-arrow:hover { background: rgba(255,255,255,.28); }
+.hs-arrow.prev { left: 22px; } .hs-arrow.next { right: 22px; }
+.hs-dots { position: absolute; bottom: 88px; left: 0; right: 0; z-index: 5; display: flex; gap: 10px; justify-content: center; }
+.hs-dots button {
+  width: 11px; height: 11px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.45); transition: all .25s;
+}
+.hs-dots button.active { background: var(--aqua-2); width: 30px; border-radius: 6px; }
+.hero-slider .hero-waves { z-index: 4; }
+
+@media (max-width: 720px) {
+  .hs-arrow { width: 40px; height: 40px; font-size: 1.3rem; }
+  .hs-arrow.prev { left: 8px; } .hs-arrow.next { right: 8px; }
+  .hs-dots { bottom: 70px; }
+}
+
+/* ---- product photos in service + gallery ---- */
+.svc-media.has-img { padding: 0; overflow: hidden; background: #fff; }
+.svc-media.has-img img { width: 100%; height: 100%; min-height: 320px; max-height: 380px; object-fit: contain; display: block; padding: 14px; }
+.svc-media.has-img.cover img { object-fit: cover; padding: 0; }
+.gallery-item.contain { background: #fff; }
+.gallery-item.contain img { object-fit: contain; padding: 8px; }
+
 </style>
 </head>
 <body>
@@ -819,7 +876,7 @@ h1, h2, h3, h4 {
   </div>
 </header>
 <section class="page-hero">
-  <div class="container"><span class="eyebrow">Gallery</span><h1>Our work in the field</h1><p>Photos and videos of installed plants, fabrication and site work. (Replace the placeholders with your own photos and video links.)</p><div class="crumbs"><a href="index.html">Home</a> / Gallery</div></div>
+  <div class="container"><span class="eyebrow">Gallery</span><h1>Our work in the field</h1><p>Real photos of our installed plants and treatment systems — RO, softener, ETP, STP, UF and DM plants delivered by MAC Aqua Filtration.</p><div class="crumbs"><a href="index.html">Home</a> / Gallery</div></div>
 </section>
 <section class="section">
   <div class="container">
@@ -829,14 +886,8 @@ h1, h2, h3, h4 {
     </div>
 
     <div data-panel="photos">
-      <div class="gallery-grid">
-        <div class="gallery-item"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Add photo</span></div><div class="cap">RO Plant installation</div></div>
-        <div class="gallery-item"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Add photo</span></div><div class="cap">Water softener unit</div></div>
-        <div class="gallery-item"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Add photo</span></div><div class="cap">ETP site work</div></div>
-        <div class="gallery-item"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Add photo</span></div><div class="cap">STP commissioning</div></div>
-        <div class="gallery-item"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Add photo</span></div><div class="cap">UF skid assembly</div></div>
-        <div class="gallery-item"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Add photo</span></div><div class="cap">Recycling plant</div></div>
-      </div>
+      <div class="gallery-grid" id="galleryGrid">
+<div class="gallery-item contain"><img src="prod-ro.jpg" alt="Industrial RO Plant"><div class="cap">Industrial &amp; Commercial RO Plant</div></div><div class="gallery-item contain"><img src="prod-softener.jpg" alt="Water Treatment Plant"><div class="cap">Water Softener &amp; Filtration Plant</div></div><div class="gallery-item contain"><img src="prod-etp.jpg" alt="ETP Plant"><div class="cap">ETP — ZS-ETP-40 KLD</div></div><div class="gallery-item contain"><img src="prod-stp.jpg" alt="STP Plant"><div class="cap">STP — ZS-STP-40 KLD</div></div><div class="gallery-item contain"><img src="prod-uf.jpg" alt="UF Plant"><div class="cap">UF Plant — ZS-UF-50 KLD</div></div><div class="gallery-item contain"><img src="prod-dm.jpg" alt="DM Plant"><div class="cap">DM Plant — ZS-DM-200 LPH</div></div>      </div>
     </div>
 
     <div data-panel="videos" class="hidden">
@@ -896,6 +947,7 @@ h1, h2, h3, h4 {
   </div>
 </footer>
 
+<script src="site-data.js"></script>
 <script>
 /* MAC AQUA FILTRATION — shared interactions */
 
@@ -1005,6 +1057,125 @@ h1, h2, h3, h4 {
       });
     });
   });
+})();
+
+/* ---- default hero slides (used if site-data.js has none) ---- */
+var DEFAULT_SLIDES = [
+  {
+    eyebrow: "Total Water & Environment Management · Since 2019",
+    title: 'Refreshing industry with <span class="accent">clean, reusable water.</span>',
+    subtitle: "Complete water and wastewater treatment plants — from softening and RO to ETP, STP and zero-liquid-discharge recycling.",
+    button: "Know More", link: "services.html",
+    image: "prod-ro.jpg"
+  },
+  {
+    eyebrow: "24×7 Service & Support",
+    title: 'Turnkey plants, <span class="accent">expertly serviced.</span>',
+    subtitle: "Design, installation, commissioning, AMC and on-site support — one accountable team for the life of your plant.",
+    button: "Our Services", link: "services.html",
+    bg: "linear-gradient(115deg,#12365f,#12B5CB)"
+  },
+  {
+    eyebrow: "Adding value across sectors",
+    title: 'Solutions for <span class="accent">industry, homes & communities.</span>',
+    subtitle: "360° water and wastewater treatment for factories, institutions, residential complexes and townships.",
+    button: "Get a Quote", link: "contact.html",
+    bg: "linear-gradient(115deg,#0A2540,#2AA0C4)"
+  }
+];
+
+/* ---- hero slider ---- */
+(function () {
+  var mount = document.getElementById('heroSlider');
+  if (!mount) return;
+  var slides = (window.SITE_DATA && Array.isArray(SITE_DATA.slides) && SITE_DATA.slides.length)
+    ? SITE_DATA.slides : DEFAULT_SLIDES;
+
+  var arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var wave = '<div class="hero-waves" aria-hidden="true"><svg viewBox="0 0 1440 90" preserveAspectRatio="none"><path fill="#ffffff" d="M0,42 C240,92 480,8 720,40 C960,72 1200,18 1440,50 L1440,90 L0,90 Z"/></svg></div>';
+
+  var html = "";
+  slides.forEach(function (s, i) {
+    var bg = s.image ? ("url('" + s.image + "')") : (s.bg || "linear-gradient(115deg,#0A2540,#1E4F9E)");
+    html += '<div class="hslide' + (i === 0 ? ' active' : '') + '" style="background-image:' + bg + '">'
+      + '<div class="container">'
+      + (s.eyebrow ? '<span class="eyebrow">' + s.eyebrow + '</span>' : '')
+      + '<h1>' + (s.title || '') + '</h1>'
+      + (s.subtitle ? '<p class="lead">' + s.subtitle + '</p>' : '')
+      + '<div class="hero-actions">'
+      + '<a href="' + (s.link || 'services.html') + '" class="btn btn-primary">' + (s.button || 'Know More') + ' ' + arrow + '</a>'
+      + '<a href="contact.html" class="btn btn-ghost">Get a Free Quote</a>'
+      + '</div></div></div>';
+  });
+  if (slides.length > 1) {
+    html += '<button class="hs-arrow prev" aria-label="Previous">\u2039</button>';
+    html += '<button class="hs-arrow next" aria-label="Next">\u203A</button>';
+    var dots = '<div class="hs-dots">';
+    slides.forEach(function (s, i) { dots += '<button class="' + (i === 0 ? 'active' : '') + '" aria-label="Slide ' + (i + 1) + '"></button>'; });
+    dots += '</div>';
+    html += dots;
+  }
+  html += wave;
+  mount.innerHTML = html;
+
+  var items = mount.querySelectorAll('.hslide');
+  var dotEls = mount.querySelectorAll('.hs-dots button');
+  var idx = 0, timer = null;
+  function go(n) {
+    items[idx].classList.remove('active');
+    if (dotEls[idx]) dotEls[idx].classList.remove('active');
+    idx = (n + items.length) % items.length;
+    items[idx].classList.add('active');
+    if (dotEls[idx]) dotEls[idx].classList.add('active');
+  }
+  function next() { go(idx + 1); }
+  function start() { if (items.length > 1) timer = setInterval(next, 6000); }
+  function stop() { clearInterval(timer); }
+
+  var p = mount.querySelector('.hs-arrow.prev'), nx = mount.querySelector('.hs-arrow.next');
+  if (p) p.addEventListener('click', function () { stop(); go(idx - 1); start(); });
+  if (nx) nx.addEventListener('click', function () { stop(); next(); start(); });
+  dotEls.forEach(function (d, i) { d.addEventListener('click', function () { stop(); go(i); start(); }); });
+  mount.addEventListener('mouseenter', stop);
+  mount.addEventListener('mouseleave', start);
+  start();
+})();
+
+/* ---- optional: render gallery photos from site-data.js ---- */
+(function () {
+  var grid = document.getElementById('galleryGrid');
+  if (!grid || !(window.SITE_DATA && Array.isArray(SITE_DATA.gallery) && SITE_DATA.gallery.length)) return;
+  grid.innerHTML = SITE_DATA.gallery.map(function (g) {
+    return '<div class="gallery-item"><img src="' + g.image + '" alt="' + (g.caption || '') + '">'
+      + (g.caption ? '<div class="cap">' + g.caption + '</div>' : '') + '</div>';
+  }).join('');
+})();
+
+/* ---- optional: render blog posts from site-data.js ---- */
+(function () {
+  var grid = document.getElementById('blogGrid');
+  if (!grid || !(window.SITE_DATA && Array.isArray(SITE_DATA.posts) && SITE_DATA.posts.length)) return;
+  var arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  grid.innerHTML = SITE_DATA.posts.map(function (p, i) {
+    var cls = ['', 'alt', 'alt2'][i % 3];
+    var thumb = p.image
+      ? '<div class="thumb" style="background-image:url(\'' + p.image + '\');background-size:cover;background-position:center;"></div>'
+      : '<div class="thumb ' + cls + '"></div>';
+    return '<article class="post">' + thumb + '<div class="body">'
+      + '<span class="meta">' + (p.category || 'Insights') + '</span>'
+      + '<h3>' + (p.title || '') + '</h3>'
+      + '<p>' + (p.excerpt || '') + '</p>'
+      + '<a class="more" href="#">Read more ' + arrow + '</a>'
+      + '</div></article>';
+  }).join('');
+})();
+
+/* ---- optional: update contact info from site-data.js ---- */
+(function () {
+  if (!(window.SITE_DATA && SITE_DATA.contact)) return;
+  var c = SITE_DATA.contact;
+  if (c.phone) document.querySelectorAll('.js-phone').forEach(function (e) { e.textContent = c.phone; });
+  if (c.email) document.querySelectorAll('.js-email').forEach(function (e) { e.textContent = c.email; });
 })();
 
 /* ---- footer year ---- */

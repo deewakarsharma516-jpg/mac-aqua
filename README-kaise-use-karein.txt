@@ -1,39 +1,43 @@
-MAC AQUA FILTRATION PVT. LTD. — WEBSITE
-=======================================
+MAC AQUA FILTRATION PVT. LTD. — WEBSITE + ADMIN PANEL
+=====================================================
 
-WEBSITE KAISE KHOLEIN
----------------------
-1. Is ZIP file ko apne computer me EXTRACT (unzip) karein.
-2. Sabhi files ek hi folder me rahengi — inhe ALAG-ALAG mat karein.
-3. Folder me "index.html" file par DOUBLE-CLICK karein.
-   -> Website browser me poori design ke saath khul jayegi.
-
-ZAROORI: index.html, styles.css, app.js aur maf_logo.png — ye sab
-ek saath ek hi folder me hone chahiye. Agar aap sirf index.html
-alag download karoge to design load nahi hoga.
-
-WEBSITE INTERNET PAR LIVE KARNE KE LIYE
----------------------------------------
-Poore folder ki saari files apni hosting/server par upload kar dein
-(jaise WTPESTORE ke liye kiya hai). Bas.
+WEBSITE KHOLNA
+--------------
+- ZIP ko EXTRACT karo. Saari files ek folder me rakho.
+- "index.html" par double-click -> website khul jayegi.
 
 PAGES
 -----
-- index.html    = Home
-- services.html = Services (6 services)
-- about.html    = About Us
-- blog.html     = Blog
-- gallery.html  = Gallery (Photos + Videos)
-- contact.html  = Contact (form + WhatsApp/Call + Map)
+index.html (Home + rotating slider) | services.html | about.html
+blog.html | gallery.html | contact.html
+admin.html  = ADMIN PANEL (content manage karne ke liye)
+site-data.js = website ka content (admin isko banata hai)
 
-BADLAV (jab chahein)
---------------------
-- Enquiry form WhatsApp number: app.js file me "WA_NUMBER" -> abhi 9899193589
-- Email: infoafs96@gmail.com (sabhi pages me)
-- Photos add karne ke liye: gallery.html me "Add photo" wali jagah
-  <img src="photos/apni-photo.jpg"> laga dein.
-- Video add karne ke liye: gallery.html me YouTube embed laga dein.
+ADMIN PANEL (bahut aasan)
+-------------------------
+1. "admin.html" kholo.
+2. Hero Slides / Gallery / Blog me photos aur text add karo.
+   (Photos yahin upload karo, ye choti ho jayengi automatically.)
+3. Niche "Download site-data.js" button dabao -> ek file download hogi.
+4. Us site-data.js file ko GitHub par upload kar do
+   (Add file -> Upload files -> Commit).
+5. 1-2 minute me LIVE website update ho jayegi.
+
+- Aapki mehnat aapke browser me apne aap save rehti hai.
+- Slides/Gallery/Blog khaali chhodo to website apna default content dikhayegi.
+
+HERO KI ROTATING IMAGES
+-----------------------
+- Admin -> Hero Slides -> "Add Slide" -> title, subtitle likho aur
+  apni plant ki photo upload karo. Jitni slides banaoge, utni rotate hongi.
+
+GITHUB PAR UPLOAD
+-----------------
+- Poora folder (saari files) GitHub repo me upload karo.
+- Settings -> Pages se live link milega.
+- index.html hamesha root me honi chahiye.
 
 Company: MAC Aqua Filtration Pvt. Ltd.
-CIN: U29299HR2019PTC079364  |  GST: 06AAMCM5547M1ZV
-Brand: ZeroScale (R)  |  Online Partner: WTPESTORE (TM)
+Phone: 9899193589 | Email: infoafs96@gmail.com
+CIN: U29299HR2019PTC079364 | GST: 06AAMCM5547M1ZV
+Brand: ZeroScale (R) | Online Partner: WTPESTORE (TM)

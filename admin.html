@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Panel · MAC Aqua Filtration</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A2540; --brand:#1E4F9E; --aqua:#12B5CB; --aqua2:#23D3C5;
+    --mist:#F3F7FB; --line:#E2E9F1; --slate:#46586E; --white:#fff;
+    --font-d:"Sora",sans-serif; --font-b:"Inter",sans-serif; --r:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font-b);background:var(--mist);color:var(--slate);line-height:1.55}
+  h1,h2,h3,h4{font-family:var(--font-d);color:var(--ink)}
+  a{color:var(--brand)}
+  .top{background:var(--ink);color:#fff;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  .top .brand{display:flex;align-items:center;gap:12px}
+  .top .brand img{height:38px;background:#fff;border-radius:8px;padding:5px 8px}
+  .top .brand b{font-family:var(--font-d);font-size:1.05rem}
+  .top .brand small{display:block;color:rgba(255,255,255,.7);font-size:.75rem}
+  .top a.view{color:#fff;font-size:.9rem;border:1px solid rgba(255,255,255,.4);padding:8px 14px;border-radius:999px;text-decoration:none}
+  .wrap{max-width:1000px;margin:0 auto;padding:22px 18px 60px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .tab{font-family:var(--font-d);font-weight:600;font-size:.92rem;padding:10px 20px;border-radius:999px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+  .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .panel{display:none} .panel.active{display:block}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:16px;box-shadow:0 2px 10px rgba(10,37,64,.05)}
+  .card .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .card .card-head h4{font-size:1rem}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  label{display:block;font-family:var(--font-d);font-weight:500;font-size:.82rem;color:var(--ink);margin:10px 0 5px}
+  input[type=text],textarea,select{width:100%;font-family:var(--font-b);font-size:.94rem;color:var(--ink);padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--aqua);box-shadow:0 0 0 3px rgba(18,181,203,.14)}
+  textarea{resize:vertical;min-height:64px}
+  .btn{font-family:var(--font-d);font-weight:600;font-size:.9rem;padding:11px 20px;border-radius:999px;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .btn-primary{background:linear-gradient(120deg,var(--brand),var(--aqua));color:#fff}
+  .btn-add{background:var(--ink);color:#fff}
+  .btn-sm{padding:7px 12px;font-size:.82rem;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+  .btn-del{color:#c0392b;border-color:#f1c9c4}
+  .btn-green{background:#25a35a;color:#fff}
+  .thumb{width:100%;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--mist)}
+  .imgrow{display:flex;gap:12px;align-items:center;margin-top:8px}
+  .imgrow img{width:120px;height:74px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .gitem{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+  .gitem input{margin-top:8px;font-size:.85rem;padding:7px 9px}
+  .hint{background:#EAF4FB;border:1px solid #cfe6f5;color:#2c5b7a;border-radius:12px;padding:14px 16px;font-size:.9rem;margin-bottom:16px}
+  .steps{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .steps ol{margin:10px 0 0 18px} .steps li{margin-bottom:9px}
+  .save-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px;border-radius:0 0 var(--r) var(--r)}
+  .save-bar .status{font-size:.85rem;color:#25a35a}
+  .empty{color:#8496a8;font-size:.9rem;padding:8px 2px}
+  @media(max-width:720px){.row{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand">
+    <img src="maf_logo.png" alt="MAF" onerror="this.style.display='none'">
+    <div><b>Admin Panel</b><small>MAC Aqua Filtration Pvt. Ltd.</small></div>
+  </div>
+  <a class="view" href="index.html" target="_blank">View Website ↗</a>
+</div>
+
+<div class="wrap">
+
+  <div class="hint">
+    Yahan <b>Slides, Gallery aur Blog</b> manage karo. Photos yahin upload karo (choti ho jayengi automatically).
+    Sab ho jaye to niche <b>“Download site-data.js”</b> dabao aur wo file GitHub par upload kar do — website update ho jayegi.
+    Aapki mehnat is browser me apne aap save rehti hai.
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="slides">🖼️ Hero Slides</button>
+    <button class="tab" data-tab="gallery">📷 Gallery</button>
+    <button class="tab" data-tab="blog">📝 Blog</button>
+    <button class="tab" data-tab="export">⬇️ Save / Export</button>
+  </div>
+
+  <!-- SLIDES -->
+  <div class="panel active" data-panel="slides">
+    <div id="slidesList"></div>
+    <button class="btn btn-add" onclick="addSlide()">+ Add Slide</button>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="panel" data-panel="gallery">
+    <div class="card">
+      <div class="card-head"><h4>Add photos</h4></div>
+      <input type="file" accept="image/*" multiple onchange="addGallery(this)">
+      <p class="empty">Ek saath kai photos choose kar sakte ho.</p>
+    </div>
+    <div class="grid3" id="galleryList"></div>
+  </div>
+
+  <!-- BLOG -->
+  <div class="panel" data-panel="blog">
+    <div id="blogList"></div>
+    <button class="btn btn-add" onclick="addPost()">+ Add Blog Post</button>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="panel" data-panel="export">
+    <div class="steps">
+      <h3>Website update kaise karein</h3>
+      <ol>
+        <li>Upar Slides / Gallery / Blog me changes karo.</li>
+        <li>Niche <b>“Download site-data.js”</b> button dabao — ek file download hogi.</li>
+        <li>GitHub repo me jaao → <b>Add file → Upload files</b> → yahi <b>site-data.js</b> upload karke Commit karo.</li>
+        <li>1–2 minute me live website update ho jayegi. ✅</li>
+      </ol>
+      <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-green" onclick="exportData()">⬇️ Download site-data.js</button>
+        <label class="btn btn-sm" style="cursor:pointer">⬆️ Import existing site-data.js
+          <input type="file" accept=".js" style="display:none" onchange="importData(this)">
+        </label>
+        <button class="btn btn-sm btn-del" onclick="clearAll()">Clear all</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="save-bar">
+    <span class="status" id="status">Auto-saved</span>
+    <button class="btn btn-green" onclick="exportData()">⬇️ Download site-data.js</button>
+  </div>
+</div>
+
+<script>
+var KEY='macaqua_admin_v1';
+var data={slides:[],gallery:[],posts:[]};
+
+/* ---- load ---- */
+try{var raw=localStorage.getItem(KEY); if(raw) data=JSON.parse(raw);}catch(e){}
+if(!data.slides)data.slides=[]; if(!data.gallery)data.gallery=[]; if(!data.posts)data.posts=[];
+
+function save(){ try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}
+  var s=document.getElementById('status'); s.textContent='Auto-saved ✓'; }
+
+/* ---- tabs ---- */
+document.querySelectorAll('.tab').forEach(function(t){
+  t.onclick=function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active')});
+    t.classList.add('active');
+    document.querySelector('[data-panel="'+t.dataset.tab+'"]').classList.add('active');
+  };
+});
+
+/* ---- image compress ---- */
+function compress(file,maxW,cb){
+  var r=new FileReader();
+  r.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      var w=img.width,h=img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      var c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      cb(c.toDataURL('image/jpeg',0.82));
+    };
+    img.src=r.result;
+  };
+  r.readAsDataURL(file);
+}
+
+/* ============ SLIDES ============ */
+var LINKS=['services.html','contact.html','about.html','gallery.html','blog.html','index.html'];
+function addSlide(){
+  data.slides.push({eyebrow:'',title:'',subtitle:'',button:'Know More',link:'services.html',image:''});
+  save();renderSlides();
+}
+function renderSlides(){
+  var box=document.getElementById('slidesList');
+  if(!data.slides.length){box.innerHTML='<p class="empty">Abhi koi slide nahi. Neeche "Add Slide" dabao. (Khaali chhoda to website apne default slides dikhayegi.)</p>';return;}
+  box.innerHTML=data.slides.map(function(s,i){
+    var opts=LINKS.map(function(l){return '<option '+(s.link===l?'selected':'')+'>'+l+'</option>'}).join('');
+    return '<div class="card">'
+      +'<div class="card-head"><h4>Slide '+(i+1)+'</h4><div>'
+      +'<button class="btn-sm" onclick="moveSlide('+i+',-1)">↑</button> '
+      +'<button class="btn-sm" onclick="moveSlide('+i+',1)">↓</button> '
+      +'<button class="btn-sm btn-del" onclick="delSlide('+i+')">Delete</button></div></div>'
+      +'<label>Small heading (eyebrow)</label><input type="text" value="'+esc(s.eyebrow)+'" oninput="upSlide('+i+',\'eyebrow\',this.value)" placeholder="e.g. 24×7 Service & Support">'
+      +'<label>Title (bada heading)</label><input type="text" value="'+esc(s.title)+'" oninput="upSlide('+i+',\'title\',this.value)" placeholder="e.g. Turnkey plants, expertly serviced.">'
+      +'<label>Subtitle</label><textarea oninput="upSlide('+i+',\'subtitle\',this.value)" placeholder="Ek line description">'+esc(s.subtitle)+'</textarea>'
+      +'<div class="row"><div><label>Button text</label><input type="text" value="'+esc(s.button)+'" oninput="upSlide('+i+',\'button\',this.value)"></div>'
+      +'<div><label>Button link</label><select onchange="upSlide('+i+',\'link\',this.value)">'+opts+'</select></div></div>'
+      +'<label>Background image</label>'
+      +'<input type="file" accept="image/*" onchange="slideImg('+i+',this)">'
+      +(s.image?'<div class="imgrow"><img src="'+s.image+'"><button class="btn-sm btn-del" onclick="upSlide('+i+',\'image\',\'\');renderSlides()">Remove image</button></div>':'<p class="empty">Image na do to ek sundar colour background lag jayega.</p>')
+      +'</div>';
+  }).join('');
+}
+function upSlide(i,k,v){data.slides[i][k]=v;save();}
+function slideImg(i,inp){if(!inp.files[0])return;compress(inp.files[0],1600,function(d){data.slides[i].image=d;save();renderSlides();});}
+function delSlide(i){if(confirm('Ye slide delete karein?')){data.slides.splice(i,1);save();renderSlides();}}
+function moveSlide(i,d){var j=i+d;if(j<0||j>=data.slides.length)return;var t=data.slides[i];data.slides[i]=data.slides[j];data.slides[j]=t;save();renderSlides();}
+
+/* ============ GALLERY ============ */
+function addGallery(inp){
+  var files=Array.prototype.slice.call(inp.files);
+  var done=0;
+  files.forEach(function(f){compress(f,1200,function(d){data.gallery.push({image:d,caption:''});done++;if(done===files.length){save();renderGallery();}});});
+  inp.value='';
+}
+function renderGallery(){
+  var box=document.getElementById('galleryList');
+  if(!data.gallery.length){box.innerHTML='<p class="empty">Abhi koi photo nahi.</p>';return;}
+  box.innerHTML=data.gallery.map(function(g,i){
+    return '<div class="gitem"><img class="thumb" src="'+g.image+'">'
+      +'<input type="text" value="'+esc(g.caption)+'" placeholder="Caption (optional)" oninput="data.gallery['+i+'].caption=this.value;save()">'
+      +'<button class="btn-sm btn-del" style="margin-top:8px;width:100%" onclick="delGallery('+i+')">Delete</button></div>';
+  }).join('');
+}
+function delGallery(i){data.gallery.splice(i,1);save();renderGallery();}
+
+/* ============ BLOG ============ */
+function addPost(){data.posts.push({title:'',category:'Insights',excerpt:'',image:''});save();renderBlog();}
+function renderBlog(){
+  var box=document.getElementById('blogList');
+  if(!data.posts.length){box.innerHTML='<p class="empty">Abhi koi blog post nahi. (Khaali chhoda to website default articles dikhayegi.)</p>';return;}
+  box.innerHTML=data.posts.map(function(p,i){
+    return '<div class="card"><div class="card-head"><h4>Post '+(i+1)+'</h4>'
+      +'<button class="btn-sm btn-del" onclick="delPost('+i+')">Delete</button></div>'
+      +'<label>Title</label><input type="text" value="'+esc(p.title)+'" oninput="data.posts['+i+'].title=this.value;save()">'
+      +'<label>Category</label><input type="text" value="'+esc(p.category)+'" oninput="data.posts['+i+'].category=this.value;save()" placeholder="e.g. Water Softening">'
+      +'<label>Short text (excerpt)</label><textarea oninput="data.posts['+i+'].excerpt=this.value;save()">'+esc(p.excerpt)+'</textarea>'
+      +'<label>Image (optional)</label><input type="file" accept="image/*" onchange="postImg('+i+',this)">'
+      +(p.image?'<div class="imgrow"><img src="'+p.image+'"><button class="btn-sm btn-del" onclick="data.posts['+i+'].image=\'\';save();renderBlog()">Remove</button></div>':'')
+      +'</div>';
+  }).join('');
+}
+function postImg(i,inp){if(!inp.files[0])return;compress(inp.files[0],1200,function(d){data.posts[i].image=d;save();renderBlog();});}
+function delPost(i){if(confirm('Ye post delete karein?')){data.posts.splice(i,1);save();renderBlog();}}
+
+/* ============ EXPORT / IMPORT ============ */
+function exportData(){
+  var out='/* MAC Aqua Filtration - website content (admin panel se generated) */\n'
+    +'window.SITE_DATA = '+JSON.stringify(data,null,2)+';\n';
+  var blob=new Blob([out],{type:'text/javascript'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='site-data.js';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+function importData(inp){
+  if(!inp.files[0])return;var r=new FileReader();
+  r.onload=function(){
+    try{
+      var txt=r.result;var s=txt.indexOf('{');var e=txt.lastIndexOf('}');
+      var obj=JSON.parse(txt.substring(s,e+1));
+      data={slides:obj.slides||[],gallery:obj.gallery||[],posts:obj.posts||[]};
+      save();renderAll();alert('Import ho gaya!');
+    }catch(err){alert('File padhi nahi ja saki. Sahi site-data.js file chuno.');}
+  };
+  r.readAsText(inp.files[0]);inp.value='';
+}
+function clearAll(){if(confirm('Sab kuch clear kar dein? (Ye undo nahi hoga)')){data={slides:[],gallery:[],posts:[]};save();renderAll();}}
+
+/* ---- utils ---- */
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderAll(){renderSlides();renderGallery();renderBlog();}
+renderAll();
+</script>
+</body>
+</html>
