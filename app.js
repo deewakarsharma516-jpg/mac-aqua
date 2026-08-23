@@ -217,35 +217,134 @@ var DEFAULT_SLIDES = [
   if (c.email) document.querySelectorAll('.js-email').forEach(function (e) { e.textContent = c.email; });
 })();
 
-/* ---- products page: load from Google Sheet (Apps Script) ---- */
+/* ---- products page: load from Google Sheet + detail modal ---- */
+var _products = [];
+var SPEC_LABELS = [
+  "Rated Capacity","Membrane Configuration","Membrane Recovery Rate","Recovery Rate",
+  "Feed Water TDS","Product Water TDS","Permeate TDS","Raw Water Requirement","Water Requirement",
+  "Pre-Treatment","Pre Treatment","Pretreatment","High Pressure Pump","Booster Pump","Dosing Pump",
+  "Control Panel","Frame / Skid","Inlet / Outlet Connection","Inlet / Outlet","Outlet Connection",
+  "Power Supply","Recommended Use","Application","Warranty","Material of Construction","MOC",
+  "Number of Membranes","No of Membranes","Working Pressure","Operating Pressure","Flow Rate",
+  "Filtration Media","Media","Vessel","Storage Tank","Air Blower","Blower","Diffuser","Motor",
+  "Capacity","Model","Voltage","Pump","Power"
+];
+function _escRe(s){ return s.replace(/[.*+?^${}()|[\]\\/-]/g,'\\$&'); }
+function _autoSpecs(text){
+  if(!text) return [];
+  var labels = SPEC_LABELS.slice().sort(function(a,b){return b.length-a.length;});
+  var re = new RegExp('\\b(' + labels.map(_escRe).join('|') + ')\\b','gi');
+  var matches=[], m;
+  while((m=re.exec(text))!==null){ matches.push({label:m[1], start:m.index, end:m.index+m[0].length}); }
+  var specs=[];
+  for(var i=0;i<matches.length;i++){
+    var val = text.slice(matches[i].end, (i+1<matches.length)?matches[i+1].start:text.length);
+    val = val.replace(/^[\s:.\-\u2013\u2014]+/,'').replace(/\s+/g,' ').trim();
+    if(val) specs.push([matches[i].label, val]);
+  }
+  return specs;
+}
+function _isSpec(l){ var i=l.indexOf(':'); return i>0 && i<=45 && l.slice(i+1).trim().length>0; }
+function _parseDesc(d){
+  d = String(d||'');
+  // 1) Manual "Label: Value" (one per line) — highest priority
+  var lines=d.split(/\r?\n/).map(function(l){return l.trim();});
+  var manual=[], paraLines=[], hasManual=false;
+  lines.forEach(function(l){
+    if(_isSpec(l)){ var i=l.indexOf(':'); manual.push([l.slice(0,i).trim(), l.slice(i+1).trim()]); hasManual=true; }
+    else if(l) paraLines.push(l);
+  });
+  if(hasManual) return {paras:paraLines, specs:manual};
+  // 2) Auto: split at "Technical Specifications"
+  var low=d.toLowerCase(); var idx=low.indexOf('technical specification');
+  var descPart=d, specPart='';
+  if(idx>-1){ descPart=d.slice(0,idx); specPart=d.slice(idx).replace(/technical\s+specifications?/i,''); }
+  var specs=_autoSpecs(specPart);
+  // 3) No keyword: detect labels anywhere; text before first label = description
+  if(idx===-1){
+    var all=_autoSpecs(d);
+    if(all.length){
+      var labels=SPEC_LABELS.slice().sort(function(a,b){return b.length-a.length;});
+      var mm=d.match(new RegExp('\\b('+labels.map(_escRe).join('|')+')\\b','i'));
+      if(mm) descPart=d.slice(0,mm.index);
+      specs=all;
+    }
+  }
+  var paras=descPart.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);
+  return {paras:paras, specs:specs};
+}
+
+function _specsTable(specs){
+  return '<table class="spec-table"><tbody>'+specs.map(function(s){
+    return '<tr><th>'+s[0]+'</th><td>'+s[1]+'</td></tr>';
+  }).join('')+'</tbody></table>';
+}
+function _short(d){
+  var p=(_parseDesc(d).paras[0])||'';
+  return p.length>130 ? p.slice(0,130).replace(/\s+\S*$/,'')+'\u2026' : p;
+}
+var SERVICES=[
+ {name:"Water Softener",category:"Water Softening",image:"prod-softener.jpg",description:"Hard water damages boilers, cooling towers, heat exchangers and laundry equipment through scale build-up. Our ion-exchange softeners remove calcium and magnesium hardness, protecting your equipment and improving efficiency. Available in manual, semi-auto and fully automatic configurations for any flow rate.",features:["Boiler feed","Cooling towers","Hotels & laundries","Process water"]},
+ {name:"Industrial & Commercial RO Plant",category:"Reverse Osmosis",image:"prod-ro.jpg",description:"High-capacity reverse osmosis plants that reduce dissolved salts (TDS), producing consistent low-TDS water for drinking, process and boiler applications. Engineered with quality membranes, dosing systems and controls, and sized precisely to your daily requirement.",features:["Low-TDS output","Bottling & food","Pharma & textile","Institutions"]},
+ {name:"ETP Plant",category:"Effluent Treatment",image:"prod-etp.jpg",description:"Effluent Treatment Plants treat industrial wastewater so it meets pollution-control discharge norms. We combine physical, chemical and biological stages tailored to your effluent, helping you stay compliant while reducing your environmental footprint.",features:["Norm compliance","Chemical & textile","Electroplating","Manufacturing"]},
+ {name:"STP Plant",category:"Sewage Treatment",image:"prod-stp.jpg",description:"Sewage Treatment Plants for residential complexes, commercial buildings, townships and industry. Using proven MBBR / SBR / activated-sludge processes, our compact STPs turn sewage into safe, reusable water for gardening, flushing and cooling make-up.",features:["Apartments","Malls & offices","Townships","Reuse-ready"]},
+ {name:"UF Plant",category:"Ultrafiltration",image:"prod-uf.jpg",description:"Ultrafiltration membranes remove suspended solids, turbidity, bacteria and cysts without chemicals, delivering clear, safe water. Often used as pre-treatment for RO or as a stand-alone stage where dissolved salts are already within limits.",features:["Turbidity removal","Bacteria & cysts","RO pre-treatment","Chemical-free"]},
+ {name:"DM Plant (Demineralisation)",category:"Demineralisation",image:"prod-dm.jpg",description:"Demineralisation (DM) plants remove nearly all dissolved minerals to produce high-purity, low-conductivity water for boilers, batteries, labs and process use. Our ZeroScale DM systems include auto TDS cut-off controllers and level sensors for hands-free operation.",features:["Boiler feed","High purity","Labs & pharma","Auto TDS control"]},
+ {name:"Water Recycling Plant",category:"Water Recycling / ZLD",image:"",description:"Recover and reuse treated water instead of discharging it. By combining treatment stages with recycling, we help you cut freshwater costs, reduce discharge and move toward Zero Liquid Discharge (ZLD).",features:["Cost savings","ZLD systems","Reduced discharge","Sustainability"]}
+];
+function _detailHTML(p){
+  var parsed=_parseDesc(p.description);
+  var badges='';
+  if(p.model) badges+='<span class="pmeta">Model: '+p.model+'</span>';
+  if(p.capacity) badges+='<span class="pmeta">Capacity: '+p.capacity+'</span>';
+  var feat=(p.features&&p.features.length)?'<h4>Applications</h4><div class="chips">'+p.features.map(function(f){return '<span>'+f+'</span>';}).join('')+'</div>':'';
+  var media=p.image?'<img src="'+p.image+'" alt="'+(p.name||'')+'">':'<div class="pm-noimg">'+(p.name||'')+'</div>';
+  return '<div class="pm-grid"><div class="pm-media">'+media+'</div>'
+    +'<div class="pm-info">'+(p.category?'<span class="ptag">'+p.category+'</span>':'')
+    +'<h2>'+(p.name||'')+'</h2>'
+    +(badges?'<div class="pm-badges">'+badges+'</div>':'')
+    +parsed.paras.map(function(x){return '<p>'+x+'</p>';}).join('')
+    +(parsed.specs.length?'<h4>Technical Specifications</h4>'+_specsTable(parsed.specs):'')
+    +feat
+    +'<div class="pm-actions"><a class="pbtn" href="contact.html">Get a Quote</a>'
+    +'<a class="pbtn-ghost" href="https://wa.me/919899193589" target="_blank" rel="noopener">WhatsApp</a></div>'
+    +'</div></div>';
+}
+function _openModal(html){ document.getElementById('pModalContent').innerHTML=html; document.getElementById('pModal').classList.add('open'); document.body.style.overflow='hidden'; }
+function openProduct(i){ var p=_products[i]; if(p) _openModal(_detailHTML(p)); }
+function openService(i){ var p=SERVICES[i]; if(p) _openModal(_detailHTML(p)); }
+function closeProduct(){ var m=document.getElementById('pModal'); if(m)m.classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeProduct(); });
 (function () {
   var grid = document.getElementById('productGrid');
   if (!grid) return;
   var status = document.getElementById('productStatus');
   var api = (window.MAC_CONFIG && window.MAC_CONFIG.productsApi) || '';
   if (!api) { if (status) status.textContent = 'Products API set nahi hai (config.js).'; return; }
-  if (status) status.textContent = 'Loading products…';
+  if (status) status.textContent = 'Loading products\u2026';
   fetch(api + '?action=products&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      var items = (d && d.products) ? d.products : [];
-      if (!items.length) { if (status) status.textContent = 'Abhi koi product nahi.'; return; }
+      _products = (d && d.products) ? d.products : [];
+      if (!_products.length) { if (status) status.textContent = 'Abhi koi product nahi.'; return; }
       if (status) status.textContent = '';
-      grid.innerHTML = items.map(function (p) {
-        var img = p.image ? '<div class="pcard-img"><img src="' + p.image + '" alt="' + (p.name || '') + '" loading="lazy"></div>' : '';
+      grid.innerHTML = _products.map(function (p, i) {
         var meta = [];
-        if (p.model) meta.push('<span class="pmeta">Model: ' + p.model + '</span>');
-        if (p.capacity) meta.push('<span class="pmeta">Capacity: ' + p.capacity + '</span>');
-        return '<div class="pcard">' + img + '<div class="pcard-body">'
+        if (p.model) meta.push('<span class="pmeta">' + p.model + '</span>');
+        if (p.capacity) meta.push('<span class="pmeta">' + p.capacity + '</span>');
+        var thumb = p.image ? '<img class="plist-thumb" src="' + p.image + '" alt="">' : '<div class="plist-thumb"></div>';
+        return '<div class="plist-item" onclick="openProduct(' + i + ')">'
+          + thumb
+          + '<div class="plist-info">'
           + (p.category ? '<span class="ptag">' + p.category + '</span>' : '')
           + '<h3>' + (p.name || '') + '</h3>'
-          + (meta.length ? '<div class="pmeta-row">' + meta.join('') + '</div>' : '')
-          + (p.description ? '<p>' + p.description + '</p>' : '')
-          + '<a class="pbtn" href="contact.html">Get a Quote</a>'
-          + '</div></div>';
+          + (meta.length ? '<div class="plist-meta">' + meta.join('') + '</div>' : '')
+          + '</div>'
+          + '<span class="plist-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
+          + '</div>';
       }).join('');
     })
-    .catch(function () { if (status) status.textContent = 'Products load nahi hue — internet / URL check karo.'; });
+    .catch(function () { if (status) status.textContent = 'Products load nahi hue \u2014 internet / URL check karo.'; });
 })();
 
 /* ---- footer year ---- */

@@ -908,13 +908,53 @@ h1, h2, h3, h4 {
 @media (max-width: 940px) { .product-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 720px) { .product-grid { grid-template-columns: 1fr; } }
 
+/* ---- product card actions + detail modal + spec table ---- */
+.pcard-img { cursor: pointer; }
+.pcard-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.pbtn-ghost { display: inline-flex; align-items: center; font-family: var(--font-display); font-weight: 600; font-size: .9rem; padding: 10px 18px; border-radius: 999px; background: #fff; color: var(--brand); border: 1.5px solid var(--line); cursor: pointer; transition: all .2s; }
+.pbtn-ghost:hover { border-color: var(--brand); transform: translateY(-2px); }
+
+.pmodal { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+.pmodal.open { display: flex; }
+.pmodal-backdrop { position: absolute; inset: 0; background: rgba(10,37,64,.6); }
+.pmodal-box { position: relative; background: #fff; border-radius: 18px; max-width: 900px; width: 100%; max-height: 90vh; overflow: auto; box-shadow: var(--shadow-lg); z-index: 2; }
+.pmodal-close { position: absolute; top: 12px; right: 14px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--mist); color: var(--ink); font-size: 1.5rem; line-height: 1; cursor: pointer; z-index: 3; }
+.pm-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 0; }
+.pm-media { background: #fff; display: grid; place-items: center; padding: 26px; border-right: 1px solid var(--line); }
+.pm-media img { max-width: 100%; max-height: 380px; object-fit: contain; }
+.pm-info { padding: 32px; }
+.pm-info h2 { font-size: 1.55rem; margin: 8px 0 12px; }
+.pm-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.pm-info p { font-size: .96rem; color: var(--slate); margin-bottom: 10px; }
+.pm-info h4 { font-family: var(--font-display); font-size: 1.05rem; margin: 20px 0 12px; color: var(--ink); }
+.spec-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.spec-table th, .spec-table td { text-align: left; padding: 9px 13px; border: 1px solid var(--line); vertical-align: top; }
+.spec-table th { background: var(--mist); color: var(--ink); font-family: var(--font-display); font-weight: 600; width: 45%; }
+.pm-actions { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+@media (max-width: 720px) { .pm-grid { grid-template-columns: 1fr; } .pm-media { border-right: 0; border-bottom: 1px solid var(--line); } .pm-info { padding: 24px; } }
+
+/* ---- products: list view (click a row to open detail) ---- */
+.product-list { display: flex; flex-direction: column; gap: 12px; max-width: 840px; margin: 0 auto; }
+.plist-item { display: flex; align-items: center; gap: 18px; padding: 14px 18px; background: #fff; border: 1px solid var(--line); border-radius: 14px; cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.plist-item:hover { border-color: var(--brand); box-shadow: var(--shadow-md); transform: translateX(4px); }
+.plist-thumb { width: 74px; height: 74px; border-radius: 10px; object-fit: contain; background: var(--mist); border: 1px solid var(--line); flex: none; padding: 6px; }
+.plist-info { flex: 1; min-width: 0; }
+.plist-info h3 { font-size: 1.12rem; margin: 3px 0; }
+.plist-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.plist-arrow { color: var(--brand); flex: none; display: grid; place-items: center; }
+.plist-arrow svg { width: 22px; height: 22px; }
+@media (max-width: 720px) { .plist-thumb { width: 56px; height: 56px; } .plist-info h3 { font-size: 1rem; } }
+
+/* ---- modal placeholder when no image ---- */
+.pm-noimg { padding: 50px 24px; color: var(--slate-soft); font-family: var(--font-display); font-weight: 600; text-align: center; }
+
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="container wrap">
     <div class="tb-left">
-      <a href="tel:+919899193589"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3-8.6A2 2 0 014.1 2H7a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8 9.6a16 16 0 006 6l1.2-1.1a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6A2 2 0 0122 16.9z"/></svg>9899193589</a>
+      <a href="tel:+919910646957"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3-8.6A2 2 0 014.1 2H7a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8 9.6a16 16 0 006 6l1.2-1.1a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6A2 2 0 0122 16.9z"/></svg>9910646957</a>
       <a href="mailto:admin.mafpl@gmail.com" class="hide-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>admin.mafpl@gmail.com</a>
       <span class="hide-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6-7-11a7 7 0 1114 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Faridabad, Haryana</span>
     </div>
@@ -922,9 +962,9 @@ h1, h2, h3, h4 {
       <a href="blog.html">Blog</a>
       <a href="gallery.html">Gallery</a>
       <span class="tb-social">
-        <a href="https://wa.me/919899193589" target="_blank" rel="noopener" class="wa" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15L2 22l5.1-1.3A10 10 0 1012 2zm4.4 12c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8 1-.3.2-.5.1a6.5 6.5 0 01-1.9-1.2 7.2 7.2 0 01-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.4.2-.4v-.4c0-.1-.5-1.3-.7-1.7s-.4-.4-.5-.4h-.5a1 1 0 00-.7.3A2.8 2.8 0 006 8.3c0 1.7 1.2 3.3 1.4 3.5s2.4 3.7 5.8 5c.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 1.4-.6 1.6-1.2.2-.6.2-1.1.1-1.2s-.2-.2-.4-.3z"/></svg></a>
-        <a href="https://www.youtube.com/@MacAquaFiltrationPvtLtdFaridab" target="_blank" rel="noopener" class="yt" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.4-.4-5a2.5 2.5 0 00-1.8-1.8C19 5 12 5 12 5s-7 0-8.8.2A2.5 2.5 0 001.4 7C1 8.6 1 12 1 12s0 3.4.4 5a2.5 2.5 0 001.8 1.8C5 19 12 19 12 19s7 0 8.8-.2a2.5 2.5 0 001.8-1.8c.4-1.6.4-5 .4-5zM10 15.5v-7l6 3.5-6 3.5z"/></svg></a>
-        <a href="https://wtpestore.co.in" target="_blank" rel="noopener" class="ig" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://wa.me/919899193589" target="_blank" rel="noopener" class="wa" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.359.101 11.945c0 2.096.549 4.14 1.595 5.945L0 24l6.335-1.652a11.882 11.882 0 005.71 1.454h.006c6.585 0 11.946-5.359 11.949-11.945a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>
+        <a href="https://www.youtube.com/@MacAquaFiltrationPvtLtdFaridab" target="_blank" rel="noopener" class="yt" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://wtpestore.co.in" target="_blank" rel="noopener" class="ig" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227a3.81 3.81 0 01-.899 1.382 3.744 3.744 0 01-1.38.896c-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421a3.716 3.716 0 01-1.379-.899 3.644 3.644 0 01-.9-1.38c-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06zm0 3.678a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm7.846-10.405a1.441 1.441 0 01-2.88 0 1.44 1.44 0 012.88 0z"/></svg></a>
       </span>
     </div>
   </div>
@@ -980,9 +1020,9 @@ h1, h2, h3, h4 {
           <b style="color:#fff;">WTPESTORE&trade;</b> — official online partner
         </p>
         <div class="social-row">
-          <a href="https://wa.me/919899193589" target="_blank" rel="noopener" class="wa" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15L2 22l5.1-1.3A10 10 0 1012 2zm4.4 12c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8 1-.3.2-.5.1a6.5 6.5 0 01-1.9-1.2 7.2 7.2 0 01-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.4.2-.4v-.4c0-.1-.5-1.3-.7-1.7s-.4-.4-.5-.4h-.5a1 1 0 00-.7.3A2.8 2.8 0 006 8.3c0 1.7 1.2 3.3 1.4 3.5s2.4 3.7 5.8 5c.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 1.4-.6 1.6-1.2.2-.6.2-1.1.1-1.2s-.2-.2-.4-.3z"/></svg></a>
-          <a href="https://www.youtube.com/@MacAquaFiltrationPvtLtdFaridab" target="_blank" rel="noopener" class="yt" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.4-.4-5a2.5 2.5 0 00-1.8-1.8C19 5 12 5 12 5s-7 0-8.8.2A2.5 2.5 0 001.4 7C1 8.6 1 12 1 12s0 3.4.4 5a2.5 2.5 0 001.8 1.8C5 19 12 19 12 19s7 0 8.8-.2a2.5 2.5 0 001.8-1.8c.4-1.6.4-5 .4-5zM10 15.5v-7l6 3.5-6 3.5z"/></svg></a>
-          <a href="https://wtpestore.co.in" target="_blank" rel="noopener" class="ig" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://wa.me/919899193589" target="_blank" rel="noopener" class="wa" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.359.101 11.945c0 2.096.549 4.14 1.595 5.945L0 24l6.335-1.652a11.882 11.882 0 005.71 1.454h.006c6.585 0 11.946-5.359 11.949-11.945a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>
+          <a href="https://www.youtube.com/@MacAquaFiltrationPvtLtdFaridab" target="_blank" rel="noopener" class="yt" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+          <a href="https://wtpestore.co.in" target="_blank" rel="noopener" class="ig" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227a3.81 3.81 0 01-.899 1.382 3.744 3.744 0 01-1.38.896c-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421a3.716 3.716 0 01-1.379-.899 3.644 3.644 0 01-.9-1.38c-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06zm0 3.678a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm7.846-10.405a1.441 1.441 0 01-2.88 0 1.44 1.44 0 012.88 0z"/></svg></a>
         </div>
       </div>
       <div class="footer-col">
@@ -1247,35 +1287,134 @@ var DEFAULT_SLIDES = [
   if (c.email) document.querySelectorAll('.js-email').forEach(function (e) { e.textContent = c.email; });
 })();
 
-/* ---- products page: load from Google Sheet (Apps Script) ---- */
+/* ---- products page: load from Google Sheet + detail modal ---- */
+var _products = [];
+var SPEC_LABELS = [
+  "Rated Capacity","Membrane Configuration","Membrane Recovery Rate","Recovery Rate",
+  "Feed Water TDS","Product Water TDS","Permeate TDS","Raw Water Requirement","Water Requirement",
+  "Pre-Treatment","Pre Treatment","Pretreatment","High Pressure Pump","Booster Pump","Dosing Pump",
+  "Control Panel","Frame / Skid","Inlet / Outlet Connection","Inlet / Outlet","Outlet Connection",
+  "Power Supply","Recommended Use","Application","Warranty","Material of Construction","MOC",
+  "Number of Membranes","No of Membranes","Working Pressure","Operating Pressure","Flow Rate",
+  "Filtration Media","Media","Vessel","Storage Tank","Air Blower","Blower","Diffuser","Motor",
+  "Capacity","Model","Voltage","Pump","Power"
+];
+function _escRe(s){ return s.replace(/[.*+?^${}()|[\]\\/-]/g,'\\$&'); }
+function _autoSpecs(text){
+  if(!text) return [];
+  var labels = SPEC_LABELS.slice().sort(function(a,b){return b.length-a.length;});
+  var re = new RegExp('\\b(' + labels.map(_escRe).join('|') + ')\\b','gi');
+  var matches=[], m;
+  while((m=re.exec(text))!==null){ matches.push({label:m[1], start:m.index, end:m.index+m[0].length}); }
+  var specs=[];
+  for(var i=0;i<matches.length;i++){
+    var val = text.slice(matches[i].end, (i+1<matches.length)?matches[i+1].start:text.length);
+    val = val.replace(/^[\s:.\-\u2013\u2014]+/,'').replace(/\s+/g,' ').trim();
+    if(val) specs.push([matches[i].label, val]);
+  }
+  return specs;
+}
+function _isSpec(l){ var i=l.indexOf(':'); return i>0 && i<=45 && l.slice(i+1).trim().length>0; }
+function _parseDesc(d){
+  d = String(d||'');
+  // 1) Manual "Label: Value" (one per line) — highest priority
+  var lines=d.split(/\r?\n/).map(function(l){return l.trim();});
+  var manual=[], paraLines=[], hasManual=false;
+  lines.forEach(function(l){
+    if(_isSpec(l)){ var i=l.indexOf(':'); manual.push([l.slice(0,i).trim(), l.slice(i+1).trim()]); hasManual=true; }
+    else if(l) paraLines.push(l);
+  });
+  if(hasManual) return {paras:paraLines, specs:manual};
+  // 2) Auto: split at "Technical Specifications"
+  var low=d.toLowerCase(); var idx=low.indexOf('technical specification');
+  var descPart=d, specPart='';
+  if(idx>-1){ descPart=d.slice(0,idx); specPart=d.slice(idx).replace(/technical\s+specifications?/i,''); }
+  var specs=_autoSpecs(specPart);
+  // 3) No keyword: detect labels anywhere; text before first label = description
+  if(idx===-1){
+    var all=_autoSpecs(d);
+    if(all.length){
+      var labels=SPEC_LABELS.slice().sort(function(a,b){return b.length-a.length;});
+      var mm=d.match(new RegExp('\\b('+labels.map(_escRe).join('|')+')\\b','i'));
+      if(mm) descPart=d.slice(0,mm.index);
+      specs=all;
+    }
+  }
+  var paras=descPart.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);
+  return {paras:paras, specs:specs};
+}
+
+function _specsTable(specs){
+  return '<table class="spec-table"><tbody>'+specs.map(function(s){
+    return '<tr><th>'+s[0]+'</th><td>'+s[1]+'</td></tr>';
+  }).join('')+'</tbody></table>';
+}
+function _short(d){
+  var p=(_parseDesc(d).paras[0])||'';
+  return p.length>130 ? p.slice(0,130).replace(/\s+\S*$/,'')+'\u2026' : p;
+}
+var SERVICES=[
+ {name:"Water Softener",category:"Water Softening",image:"prod-softener.jpg",description:"Hard water damages boilers, cooling towers, heat exchangers and laundry equipment through scale build-up. Our ion-exchange softeners remove calcium and magnesium hardness, protecting your equipment and improving efficiency. Available in manual, semi-auto and fully automatic configurations for any flow rate.",features:["Boiler feed","Cooling towers","Hotels & laundries","Process water"]},
+ {name:"Industrial & Commercial RO Plant",category:"Reverse Osmosis",image:"prod-ro.jpg",description:"High-capacity reverse osmosis plants that reduce dissolved salts (TDS), producing consistent low-TDS water for drinking, process and boiler applications. Engineered with quality membranes, dosing systems and controls, and sized precisely to your daily requirement.",features:["Low-TDS output","Bottling & food","Pharma & textile","Institutions"]},
+ {name:"ETP Plant",category:"Effluent Treatment",image:"prod-etp.jpg",description:"Effluent Treatment Plants treat industrial wastewater so it meets pollution-control discharge norms. We combine physical, chemical and biological stages tailored to your effluent, helping you stay compliant while reducing your environmental footprint.",features:["Norm compliance","Chemical & textile","Electroplating","Manufacturing"]},
+ {name:"STP Plant",category:"Sewage Treatment",image:"prod-stp.jpg",description:"Sewage Treatment Plants for residential complexes, commercial buildings, townships and industry. Using proven MBBR / SBR / activated-sludge processes, our compact STPs turn sewage into safe, reusable water for gardening, flushing and cooling make-up.",features:["Apartments","Malls & offices","Townships","Reuse-ready"]},
+ {name:"UF Plant",category:"Ultrafiltration",image:"prod-uf.jpg",description:"Ultrafiltration membranes remove suspended solids, turbidity, bacteria and cysts without chemicals, delivering clear, safe water. Often used as pre-treatment for RO or as a stand-alone stage where dissolved salts are already within limits.",features:["Turbidity removal","Bacteria & cysts","RO pre-treatment","Chemical-free"]},
+ {name:"DM Plant (Demineralisation)",category:"Demineralisation",image:"prod-dm.jpg",description:"Demineralisation (DM) plants remove nearly all dissolved minerals to produce high-purity, low-conductivity water for boilers, batteries, labs and process use. Our ZeroScale DM systems include auto TDS cut-off controllers and level sensors for hands-free operation.",features:["Boiler feed","High purity","Labs & pharma","Auto TDS control"]},
+ {name:"Water Recycling Plant",category:"Water Recycling / ZLD",image:"",description:"Recover and reuse treated water instead of discharging it. By combining treatment stages with recycling, we help you cut freshwater costs, reduce discharge and move toward Zero Liquid Discharge (ZLD).",features:["Cost savings","ZLD systems","Reduced discharge","Sustainability"]}
+];
+function _detailHTML(p){
+  var parsed=_parseDesc(p.description);
+  var badges='';
+  if(p.model) badges+='<span class="pmeta">Model: '+p.model+'</span>';
+  if(p.capacity) badges+='<span class="pmeta">Capacity: '+p.capacity+'</span>';
+  var feat=(p.features&&p.features.length)?'<h4>Applications</h4><div class="chips">'+p.features.map(function(f){return '<span>'+f+'</span>';}).join('')+'</div>':'';
+  var media=p.image?'<img src="'+p.image+'" alt="'+(p.name||'')+'">':'<div class="pm-noimg">'+(p.name||'')+'</div>';
+  return '<div class="pm-grid"><div class="pm-media">'+media+'</div>'
+    +'<div class="pm-info">'+(p.category?'<span class="ptag">'+p.category+'</span>':'')
+    +'<h2>'+(p.name||'')+'</h2>'
+    +(badges?'<div class="pm-badges">'+badges+'</div>':'')
+    +parsed.paras.map(function(x){return '<p>'+x+'</p>';}).join('')
+    +(parsed.specs.length?'<h4>Technical Specifications</h4>'+_specsTable(parsed.specs):'')
+    +feat
+    +'<div class="pm-actions"><a class="pbtn" href="contact.html">Get a Quote</a>'
+    +'<a class="pbtn-ghost" href="https://wa.me/919899193589" target="_blank" rel="noopener">WhatsApp</a></div>'
+    +'</div></div>';
+}
+function _openModal(html){ document.getElementById('pModalContent').innerHTML=html; document.getElementById('pModal').classList.add('open'); document.body.style.overflow='hidden'; }
+function openProduct(i){ var p=_products[i]; if(p) _openModal(_detailHTML(p)); }
+function openService(i){ var p=SERVICES[i]; if(p) _openModal(_detailHTML(p)); }
+function closeProduct(){ var m=document.getElementById('pModal'); if(m)m.classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeProduct(); });
 (function () {
   var grid = document.getElementById('productGrid');
   if (!grid) return;
   var status = document.getElementById('productStatus');
   var api = (window.MAC_CONFIG && window.MAC_CONFIG.productsApi) || '';
   if (!api) { if (status) status.textContent = 'Products API set nahi hai (config.js).'; return; }
-  if (status) status.textContent = 'Loading products…';
+  if (status) status.textContent = 'Loading products\u2026';
   fetch(api + '?action=products&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      var items = (d && d.products) ? d.products : [];
-      if (!items.length) { if (status) status.textContent = 'Abhi koi product nahi.'; return; }
+      _products = (d && d.products) ? d.products : [];
+      if (!_products.length) { if (status) status.textContent = 'Abhi koi product nahi.'; return; }
       if (status) status.textContent = '';
-      grid.innerHTML = items.map(function (p) {
-        var img = p.image ? '<div class="pcard-img"><img src="' + p.image + '" alt="' + (p.name || '') + '" loading="lazy"></div>' : '';
+      grid.innerHTML = _products.map(function (p, i) {
         var meta = [];
-        if (p.model) meta.push('<span class="pmeta">Model: ' + p.model + '</span>');
-        if (p.capacity) meta.push('<span class="pmeta">Capacity: ' + p.capacity + '</span>');
-        return '<div class="pcard">' + img + '<div class="pcard-body">'
+        if (p.model) meta.push('<span class="pmeta">' + p.model + '</span>');
+        if (p.capacity) meta.push('<span class="pmeta">' + p.capacity + '</span>');
+        var thumb = p.image ? '<img class="plist-thumb" src="' + p.image + '" alt="">' : '<div class="plist-thumb"></div>';
+        return '<div class="plist-item" onclick="openProduct(' + i + ')">'
+          + thumb
+          + '<div class="plist-info">'
           + (p.category ? '<span class="ptag">' + p.category + '</span>' : '')
           + '<h3>' + (p.name || '') + '</h3>'
-          + (meta.length ? '<div class="pmeta-row">' + meta.join('') + '</div>' : '')
-          + (p.description ? '<p>' + p.description + '</p>' : '')
-          + '<a class="pbtn" href="contact.html">Get a Quote</a>'
-          + '</div></div>';
+          + (meta.length ? '<div class="plist-meta">' + meta.join('') + '</div>' : '')
+          + '</div>'
+          + '<span class="plist-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
+          + '</div>';
       }).join('');
     })
-    .catch(function () { if (status) status.textContent = 'Products load nahi hue — internet / URL check karo.'; });
+    .catch(function () { if (status) status.textContent = 'Products load nahi hue \u2014 internet / URL check karo.'; });
 })();
 
 /* ---- footer year ---- */
