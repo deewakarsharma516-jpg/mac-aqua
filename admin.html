@@ -203,16 +203,29 @@ async function doLogin(){
 function logout(){ sessionStorage.removeItem('macaqua_pw'); location.reload(); }
 
 /* auto-login if password stored this session */
-(function(){ setUrlFields(); var p=sessionStorage.getItem('macaqua_pw'); if(p&&API){ PW=p; document.getElementById('lockScreen').classList.add('hidden'); } })();
+(function(){ setUrlFields(); if(API){var ub=document.getElementById('urlBox'); if(ub) ub.style.display='none';} var p=sessionStorage.getItem('macaqua_pw'); if(p&&API){ PW=p; document.getElementById('lockScreen').classList.add('hidden'); loadProducts(); renderAll(); } })();
 
 /* ============ PRODUCTS (Google Sheet) ============ */
+var DEFAULT_PRODUCTS=[
+  {name:'Water Softener', model:'AFS Series', category:'Water Softening', capacity:'Custom', description:'Ion-exchange water softener that removes hardness and protects boilers, cooling towers and equipment from scale.', image:'prod-softener.jpg'},
+  {name:'Industrial & Commercial RO Plant', model:'ZS-RO', category:'Reverse Osmosis', capacity:'Custom LPH', description:'High-capacity reverse osmosis plant for consistent, low-TDS process and drinking water.', image:'prod-ro.jpg'},
+  {name:'ETP Plant', model:'ZS-ETP-40KLD', category:'Effluent Treatment', capacity:'40 KLD', description:'Effluent treatment plant to bring industrial wastewater within pollution-control discharge norms.', image:'prod-etp.jpg'},
+  {name:'STP Plant', model:'ZS-STP-40KLD', category:'Sewage Treatment', capacity:'40 KLD', description:'Compact sewage treatment plant for buildings, townships and industry.', image:'prod-stp.jpg'},
+  {name:'UF Plant', model:'ZS-UF-50KLD', category:'Ultrafiltration', capacity:'50 KLD', description:'Ultrafiltration plant for chemical-free removal of turbidity, bacteria and suspended solids.', image:'prod-uf.jpg'},
+  {name:'DM Plant', model:'ZS-DM-200LPH', category:'Demineralisation', capacity:'200 LPH', description:'Demineralisation plant for high-purity, low-conductivity water with auto TDS cut-off.', image:'prod-dm.jpg'}
+];
 var products=[];
 async function loadProducts(){
   var st=document.getElementById('prodStatus'); st.textContent='Loading products from Google Sheet…'; st.className='status';
   try{
     var r=await apiGetProducts();
-    products=(r&&r.products)?r.products:[];
-    st.textContent=products.length+' product(s) loaded.'; st.className='status ok';
+    if(r&&r.products&&r.products.length){
+      products=r.products;
+      st.textContent=products.length+' product(s) loaded from Google Sheet.'; st.className='status ok';
+    }else{
+      products=DEFAULT_PRODUCTS.map(function(p){return Object.assign({},p);});
+      st.innerHTML='Sheet khaali thi — <b>'+products.length+' default products</b> load kiye. Edit/Delete karke niche <b>"Save to Google Sheet"</b> dabao taaki ye sheet me chale jaayen.'; st.className='status';
+    }
     renderProducts();
   }catch(e){ st.textContent='Load nahi hua — URL/internet check karo.'; st.className='status err'; }
 }
