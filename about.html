@@ -890,6 +890,24 @@ h1, h2, h3, h4 {
 .social-row a.yt:hover { background: #FF0000; border-color: #FF0000; transform: translateY(-2px); }
 .social-row a.ig:hover { background: linear-gradient(45deg,#F58529,#DD2A7B,#8134AF); border-color: transparent; transform: translateY(-2px); }
 
+/* ---- products page ---- */
+.product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.pcard { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: transform .28s, box-shadow .28s; }
+.pcard:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+.pcard-img { height: 210px; background: #fff; display: grid; place-items: center; border-bottom: 1px solid var(--line); overflow: hidden; }
+.pcard-img img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
+.pcard-body { padding: 22px; display: flex; flex-direction: column; flex: 1; }
+.ptag { font-family: var(--font-display); font-weight: 600; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--aqua); margin-bottom: 8px; }
+.pcard h3 { font-size: 1.15rem; margin-bottom: 10px; }
+.pmeta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.pmeta { font-size: .8rem; font-family: var(--font-display); background: var(--mist); border: 1px solid var(--line); color: var(--slate); padding: 4px 11px; border-radius: 999px; }
+.pcard p { font-size: .94rem; color: var(--slate); flex: 1; }
+.pbtn { align-self: flex-start; display: inline-flex; align-items: center; margin-top: 16px; font-family: var(--font-display); font-weight: 600; font-size: .9rem; padding: 11px 20px; border-radius: 999px; background: linear-gradient(120deg, var(--brand), var(--aqua)); color: #fff; transition: transform .2s; }
+.pbtn:hover { transform: translateY(-2px); }
+.prod-status { text-align: center; color: var(--slate-soft); font-size: .95rem; padding: 20px 0; }
+@media (max-width: 940px) { .product-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 720px) { .product-grid { grid-template-columns: 1fr; } }
+
 </style>
 </head>
 <body>
@@ -917,6 +935,7 @@ h1, h2, h3, h4 {
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="services.html">Services</a></li>
+      <li><a href="products.html">Products</a></li>
       <li><a href="about.html" aria-current="page">About</a></li>
       <li><a href="blog.html">Blog</a></li>
       <li><a href="gallery.html">Gallery</a></li>
@@ -1028,6 +1047,7 @@ h1, h2, h3, h4 {
 {"@context":"https://schema.org","@type":"LocalBusiness","name":"MAC Aqua Filtration Pvt. Ltd.","image":"https://deewakarsharma516-jpg.github.io/mac-aqua/maf_logo.png","url":"https://deewakarsharma516-jpg.github.io/mac-aqua/","telephone":"+91-9899193589","email":"admin.mafpl@gmail.com","address":{"@type":"PostalAddress","streetAddress":"B-198, Royal Plaza, Green Field, Near HDFC Bank","addressLocality":"Faridabad","addressRegion":"Haryana","postalCode":"121003","addressCountry":"IN"},"areaServed":"IN","foundingDate":"2019","description":"Manufacturer of water and wastewater treatment plants — water softeners, industrial & commercial RO, ETP, STP, UF, DM and water recycling (ZLD) plants.","sameAs":["https://www.youtube.com/@MacAquaFiltrationPvtLtdFaridab","https://wtpestore.co.in"]}
 </script>
 
+<script src="config.js"></script>
 <script src="site-data.js"></script>
 <script>
 /* MAC AQUA FILTRATION — shared interactions */
@@ -1247,6 +1267,37 @@ var DEFAULT_SLIDES = [
   var c = SITE_DATA.contact;
   if (c.phone) document.querySelectorAll('.js-phone').forEach(function (e) { e.textContent = c.phone; });
   if (c.email) document.querySelectorAll('.js-email').forEach(function (e) { e.textContent = c.email; });
+})();
+
+/* ---- products page: load from Google Sheet (Apps Script) ---- */
+(function () {
+  var grid = document.getElementById('productGrid');
+  if (!grid) return;
+  var status = document.getElementById('productStatus');
+  var api = (window.MAC_CONFIG && window.MAC_CONFIG.productsApi) || '';
+  if (!api) { if (status) status.textContent = 'Products API set nahi hai (config.js).'; return; }
+  if (status) status.textContent = 'Loading products…';
+  fetch(api + '?action=products&t=' + Date.now())
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var items = (d && d.products) ? d.products : [];
+      if (!items.length) { if (status) status.textContent = 'Abhi koi product nahi.'; return; }
+      if (status) status.textContent = '';
+      grid.innerHTML = items.map(function (p) {
+        var img = p.image ? '<div class="pcard-img"><img src="' + p.image + '" alt="' + (p.name || '') + '" loading="lazy"></div>' : '';
+        var meta = [];
+        if (p.model) meta.push('<span class="pmeta">Model: ' + p.model + '</span>');
+        if (p.capacity) meta.push('<span class="pmeta">Capacity: ' + p.capacity + '</span>');
+        return '<div class="pcard">' + img + '<div class="pcard-body">'
+          + (p.category ? '<span class="ptag">' + p.category + '</span>' : '')
+          + '<h3>' + (p.name || '') + '</h3>'
+          + (meta.length ? '<div class="pmeta-row">' + meta.join('') + '</div>' : '')
+          + (p.description ? '<p>' + p.description + '</p>' : '')
+          + '<a class="pbtn" href="contact.html">Get a Quote</a>'
+          + '</div></div>';
+      }).join('');
+    })
+    .catch(function () { if (status) status.textContent = 'Products load nahi hue — internet / URL check karo.'; });
 })();
 
 /* ---- footer year ---- */

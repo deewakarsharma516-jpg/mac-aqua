@@ -217,6 +217,37 @@ var DEFAULT_SLIDES = [
   if (c.email) document.querySelectorAll('.js-email').forEach(function (e) { e.textContent = c.email; });
 })();
 
+/* ---- products page: load from Google Sheet (Apps Script) ---- */
+(function () {
+  var grid = document.getElementById('productGrid');
+  if (!grid) return;
+  var status = document.getElementById('productStatus');
+  var api = (window.MAC_CONFIG && window.MAC_CONFIG.productsApi) || '';
+  if (!api) { if (status) status.textContent = 'Products API set nahi hai (config.js).'; return; }
+  if (status) status.textContent = 'Loading products…';
+  fetch(api + '?action=products&t=' + Date.now())
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var items = (d && d.products) ? d.products : [];
+      if (!items.length) { if (status) status.textContent = 'Abhi koi product nahi.'; return; }
+      if (status) status.textContent = '';
+      grid.innerHTML = items.map(function (p) {
+        var img = p.image ? '<div class="pcard-img"><img src="' + p.image + '" alt="' + (p.name || '') + '" loading="lazy"></div>' : '';
+        var meta = [];
+        if (p.model) meta.push('<span class="pmeta">Model: ' + p.model + '</span>');
+        if (p.capacity) meta.push('<span class="pmeta">Capacity: ' + p.capacity + '</span>');
+        return '<div class="pcard">' + img + '<div class="pcard-body">'
+          + (p.category ? '<span class="ptag">' + p.category + '</span>' : '')
+          + '<h3>' + (p.name || '') + '</h3>'
+          + (meta.length ? '<div class="pmeta-row">' + meta.join('') + '</div>' : '')
+          + (p.description ? '<p>' + p.description + '</p>' : '')
+          + '<a class="pbtn" href="contact.html">Get a Quote</a>'
+          + '</div></div>';
+      }).join('');
+    })
+    .catch(function () { if (status) status.textContent = 'Products load nahi hue — internet / URL check karo.'; });
+})();
+
 /* ---- footer year ---- */
 (function () {
   var y = document.getElementById('year');
