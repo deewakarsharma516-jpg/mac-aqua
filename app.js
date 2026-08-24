@@ -321,30 +321,35 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeProd
   var status = document.getElementById('productStatus');
   var api = (window.MAC_CONFIG && window.MAC_CONFIG.productsApi) || '';
   if (!api) { if (status) status.textContent = 'Products API set nahi hai (config.js).'; return; }
-  if (status) status.textContent = 'Loading products\u2026';
+  var CACHE = 'macaqua_products_cache';
+  function render(items){
+    _products = items || [];
+    grid.innerHTML = _products.map(function (p, i) {
+      var meta = [];
+      if (p.model) meta.push('<span class="pmeta">' + p.model + '</span>');
+      if (p.capacity) meta.push('<span class="pmeta">' + p.capacity + '</span>');
+      var thumb = p.image ? '<img class="plist-thumb" src="' + p.image + '" alt="" loading="lazy">' : '<div class="plist-thumb"></div>';
+      return '<div class="plist-item" onclick="openProduct(' + i + ')">'
+        + thumb
+        + '<div class="plist-info">'
+        + (p.category ? '<span class="ptag">' + p.category + '</span>' : '')
+        + '<h3>' + (p.name || '') + '</h3>'
+        + (meta.length ? '<div class="plist-meta">' + meta.join('') + '</div>' : '')
+        + '</div>'
+        + '<span class="plist-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
+        + '</div>';
+    }).join('');
+    if (status) status.textContent = '';
+  }
+  try { var c = JSON.parse(localStorage.getItem(CACHE) || 'null'); if (c && c.length) render(c); else if (status) status.textContent = 'Loading products\u2026'; } catch(e){ if (status) status.textContent = 'Loading\u2026'; }
   fetch(api + '?action=products&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      _products = (d && d.products) ? d.products : [];
-      if (!_products.length) { if (status) status.textContent = 'Abhi koi product nahi.'; return; }
-      if (status) status.textContent = '';
-      grid.innerHTML = _products.map(function (p, i) {
-        var meta = [];
-        if (p.model) meta.push('<span class="pmeta">' + p.model + '</span>');
-        if (p.capacity) meta.push('<span class="pmeta">' + p.capacity + '</span>');
-        var thumb = p.image ? '<img class="plist-thumb" src="' + p.image + '" alt="">' : '<div class="plist-thumb"></div>';
-        return '<div class="plist-item" onclick="openProduct(' + i + ')">'
-          + thumb
-          + '<div class="plist-info">'
-          + (p.category ? '<span class="ptag">' + p.category + '</span>' : '')
-          + '<h3>' + (p.name || '') + '</h3>'
-          + (meta.length ? '<div class="plist-meta">' + meta.join('') + '</div>' : '')
-          + '</div>'
-          + '<span class="plist-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
-          + '</div>';
-      }).join('');
+      var items = (d && d.products) ? d.products : [];
+      if (items.length) { render(items); try { localStorage.setItem(CACHE, JSON.stringify(items)); } catch(e){} }
+      else if (!_products.length) { if (status) status.textContent = 'Abhi koi product nahi.'; }
     })
-    .catch(function () { if (status) status.textContent = 'Products load nahi hue \u2014 internet / URL check karo.'; });
+    .catch(function () { if (!_products.length && status) status.textContent = 'Products load nahi hue \u2014 internet / URL check karo.'; });
 })();
 
 /* ---- footer year ---- */
