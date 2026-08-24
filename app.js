@@ -298,23 +298,36 @@ function _detailHTML(p){
   if(p.model) badges+='<span class="pmeta">Model: '+p.model+'</span>';
   if(p.capacity) badges+='<span class="pmeta">Capacity: '+p.capacity+'</span>';
   var feat=(p.features&&p.features.length)?'<h4>Applications</h4><div class="chips">'+p.features.map(function(f){return '<span>'+f+'</span>';}).join('')+'</div>':'';
-  var media=p.image?'<img src="'+p.image+'" alt="'+(p.name||'')+'">':'<div class="pm-noimg">'+(p.name||'')+'</div>';
-  return '<div class="pm-grid"><div class="pm-media">'+media+'</div>'
-    +'<div class="pm-info">'+(p.category?'<span class="ptag">'+p.category+'</span>':'')
-    +'<h2>'+(p.name||'')+'</h2>'
-    +(badges?'<div class="pm-badges">'+badges+'</div>':'')
-    +parsed.paras.map(function(x){return '<p>'+x+'</p>';}).join('')
-    +(parsed.specs.length?'<h4>Technical Specifications</h4>'+_specsTable(parsed.specs):'')
-    +feat
-    +'<div class="pm-actions"><a class="pbtn" href="contact.html">Get a Quote</a>'
-    +'<a class="pbtn-ghost" href="https://wa.me/919899193589" target="_blank" rel="noopener">WhatsApp</a></div>'
-    +'</div></div>';
+  var hero=p.image?'<div class="detail-hero"><img src="'+p.image+'" alt="'+(p.name||'')+'"></div>':'';
+  return '<button class="detail-back" onclick="closeDetail()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg> Back to list</button>'
+    + hero
+    + '<div class="detail-body">'
+    + (p.category?'<span class="ptag">'+p.category+'</span>':'')
+    + '<h2>'+(p.name||'')+'</h2>'
+    + (badges?'<div class="detail-badges">'+badges+'</div>':'')
+    + parsed.paras.map(function(x){return '<p>'+x+'</p>';}).join('')
+    + (parsed.specs.length?'<h4>Technical Specifications</h4>'+_specsTable(parsed.specs):'')
+    + feat
+    + '<div class="detail-actions"><a class="pbtn" href="contact.html">Get a Quote</a><a class="pbtn-ghost" href="https://wa.me/919899193589" target="_blank" rel="noopener">WhatsApp</a></div>'
+    + '</div>';
 }
-function _openModal(html){ document.getElementById('pModalContent').innerHTML=html; document.getElementById('pModal').classList.add('open'); document.body.style.overflow='hidden'; }
-function openProduct(i){ var p=_products[i]; if(p) _openModal(_detailHTML(p)); }
-function openService(i){ var p=SERVICES[i]; if(p) _openModal(_detailHTML(p)); }
-function closeProduct(){ var m=document.getElementById('pModal'); if(m)m.classList.remove('open'); document.body.style.overflow=''; }
-document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeProduct(); });
+function _listEl(){ return document.getElementById('productGrid') || document.getElementById('serviceList'); }
+function _openDetail(html){
+  var dv=document.getElementById('detailView'); if(!dv) return;
+  dv.innerHTML=html; dv.classList.add('open');
+  var g=_listEl(); if(g) g.classList.add('list-hidden');
+  var st=document.getElementById('productStatus'); if(st) st.classList.add('list-hidden');
+  var y=dv.getBoundingClientRect().top+window.pageYOffset-90;
+  window.scrollTo({top:Math.max(0,y),behavior:'auto'});
+}
+function closeDetail(){
+  var dv=document.getElementById('detailView'); if(dv){dv.classList.remove('open');dv.innerHTML='';}
+  var g=_listEl(); if(g) g.classList.remove('list-hidden');
+  var st=document.getElementById('productStatus'); if(st) st.classList.remove('list-hidden');
+}
+function openProduct(i){ var p=_products[i]; if(p) _openDetail(_detailHTML(p)); }
+function openService(i){ var p=SERVICES[i]; if(p) _openDetail(_detailHTML(p)); }
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDetail(); });
 (function () {
   var grid = document.getElementById('productGrid');
   if (!grid) return;
