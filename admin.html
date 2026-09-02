@@ -111,6 +111,8 @@
   <!-- PRODUCTS (Google Sheet) -->
   <div class="panel active" data-panel="products">
     <div class="hint">Ye products <b>Google Sheet</b> me save hote hain. Add/Delete karke niche <b>"Save to Google Sheet"</b> dabao — sheet turant update ho jayegi.</div>
+    <div class="hint">📂 <b>Category-wise:</b> Same category naam wale products website par ek saath group hote hain. Category field me niche dropdown se chuno (ya naya naam type karke nayi category banao). Phir Model add karo.</div>
+    <datalist id="catList"></datalist>
     <div id="prodStatus" class="status" style="margin-bottom:10px"></div>
     <div id="productList"></div>
     <button class="btn btn-add" onclick="addProduct()">+ Add Product</button>
@@ -230,7 +232,13 @@ async function loadProducts(){
   }catch(e){ st.textContent='Load nahi hua — URL/internet check karo.'; st.className='status err'; }
 }
 function addProduct(){ products.push({name:'',model:'',category:'',capacity:'',description:'',image:''}); renderProducts(); }
-function renderProducts(){
+function updateCatList(){
+  var dl=document.getElementById('catList'); if(!dl) return;
+  var seen={}, out='';
+  products.forEach(function(p){ var c=(p.category||'').trim(); if(c && !seen[c]){ seen[c]=1; out+='<option value="'+c.replace(/"/g,'&quot;')+'">'; } });
+  dl.innerHTML=out;
+}
+function renderProducts(){ updateCatList();
   var box=document.getElementById('productList');
   if(!products.length){ box.innerHTML='<p class="empty">Abhi koi product nahi. "Add Product" dabao.</p>'; return; }
   box.innerHTML=products.map(function(p,i){
@@ -238,7 +246,7 @@ function renderProducts(){
       +'<button class="btn-sm btn-del" onclick="delProduct('+i+')">Delete</button></div>'
       +'<div class="row"><div><label>Name</label><input type="text" value="'+esc(p.name)+'" oninput="products['+i+'].name=this.value"></div>'
       +'<div><label>Model No.</label><input type="text" value="'+esc(p.model)+'" oninput="products['+i+'].model=this.value"></div></div>'
-      +'<div class="row"><div><label>Category</label><input type="text" value="'+esc(p.category)+'" oninput="products['+i+'].category=this.value" placeholder="e.g. RO Plant"></div>'
+      +'<div class="row"><div><label>Category (dropdown se chuno ya naya likho)</label><input type="text" list="catList" value="'+esc(p.category)+'" oninput="products['+i+'].category=this.value;updateCatList()" placeholder="e.g. RO Plant"></div>'
       +'<div><label>Capacity</label><input type="text" value="'+esc(p.capacity)+'" oninput="products['+i+'].capacity=this.value" placeholder="e.g. 40 KLD"></div></div>'
       +'<label>Description</label><textarea oninput="products['+i+'].description=this.value">'+esc(p.description)+'</textarea>'
       +'<label>Image URL (optional)</label><input type="text" value="'+esc(p.image)+'" oninput="products['+i+'].image=this.value" placeholder="https://... (ya website ki photo ka naam)">'

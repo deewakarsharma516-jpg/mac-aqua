@@ -311,7 +311,7 @@ function _detailHTML(p){
     + '<div class="detail-actions"><a class="pbtn" href="contact.html">Get a Quote</a><a class="pbtn-ghost" href="https://wa.me/919899193589" target="_blank" rel="noopener">WhatsApp</a></div>'
     + '</div>';
 }
-function _listEl(){ return document.getElementById('productGrid') || document.getElementById('serviceList'); }
+function _listEl(){ return document.getElementById('productGrid') || document.getElementById('serviceList') || document.getElementById('catModels'); }
 function _openDetail(html){
   var dv=document.getElementById('detailView'); if(!dv) return;
   dv.innerHTML=html; dv.classList.add('open');
@@ -328,6 +328,51 @@ function closeDetail(){
 function openProduct(i){ var p=_products[i]; if(p) _openDetail(_detailHTML(p)); }
 function openService(i){ var p=SERVICES[i]; if(p) _openDetail(_detailHTML(p)); }
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDetail(); });
+/* ---- catalog: categories -> models -> detail ---- */
+var _cats=[]; var _curCat=-1;
+var _ARROW='<span class="plist-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+var _BACK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function _thumb(img){ return img?'<img class="plist-thumb" src="'+img+'" alt="" loading="lazy">':'<div class="plist-thumb"></div>'; }
+function _buildCats(){
+  _cats=[]; var map={};
+  _products.forEach(function(p,i){
+    var c=((p.category||'Other')+'').trim()||'Other';
+    if(!map[c]){ map[c]={name:c,indices:[],image:p.image||''}; _cats.push(map[c]); }
+    map[c].indices.push(i);
+    if(!map[c].image && p.image) map[c].image=p.image;
+  });
+}
+function renderCategories(){
+  var grid=document.getElementById('productGrid'); if(!grid) return;
+  _curCat=-1;
+  var dv=document.getElementById('detailView'); if(dv){dv.classList.remove('open');dv.innerHTML='';}
+  grid.classList.remove('list-hidden');
+  var st=document.getElementById('productStatus'); if(st) st.classList.remove('list-hidden');
+  grid.innerHTML=_cats.map(function(c,ci){
+    return '<div class="plist-item" onclick="openCategory('+ci+')">'+_thumb(c.image)
+      +'<div class="plist-info"><span class="ptag">Category</span><h3>'+c.name+'</h3>'
+      +'<div class="plist-meta"><span class="pmeta">'+c.indices.length+' model'+(c.indices.length>1?'s':'')+'</span></div></div>'
+      +_ARROW+'</div>';
+  }).join('');
+  window.scrollTo({top:0,behavior:'auto'});
+}
+function openCategory(ci){
+  var grid=document.getElementById('productGrid'); if(!grid) return;
+  _curCat=ci; var c=_cats[ci];
+  var dv=document.getElementById('detailView'); if(dv){dv.classList.remove('open');dv.innerHTML='';}
+  grid.classList.remove('list-hidden');
+  var items=c.indices.map(function(pi){
+    var p=_products[pi]; var meta=[];
+    if(p.model) meta.push('<span class="pmeta">'+p.model+'</span>');
+    if(p.capacity) meta.push('<span class="pmeta">'+p.capacity+'</span>');
+    return '<div class="plist-item" onclick="openProduct('+pi+')">'+_thumb(p.image)
+      +'<div class="plist-info"><span class="ptag">'+c.name+'</span><h3>'+(p.name||'')+'</h3>'
+      +(meta.length?'<div class="plist-meta">'+meta.join('')+'</div>':'')+'</div>'+_ARROW+'</div>';
+  }).join('');
+  grid.innerHTML='<button class="detail-back" onclick="renderCategories()">'+_BACK+' All categories</button>'
+    +'<h3 class="cat-title">'+c.name+'</h3>'+items;
+  var y=grid.getBoundingClientRect().top+window.pageYOffset-90; window.scrollTo({top:Math.max(0,y),behavior:'auto'});
+}
 (function () {
   var grid = document.getElementById('productGrid');
   if (!grid) return;
@@ -335,34 +380,43 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDeta
   var api = (window.MAC_CONFIG && window.MAC_CONFIG.productsApi) || '';
   if (!api) { if (status) status.textContent = 'Products API set nahi hai (config.js).'; return; }
   var CACHE = 'macaqua_products_cache';
-  function render(items){
-    _products = items || [];
-    grid.innerHTML = _products.map(function (p, i) {
-      var meta = [];
-      if (p.model) meta.push('<span class="pmeta">' + p.model + '</span>');
-      if (p.capacity) meta.push('<span class="pmeta">' + p.capacity + '</span>');
-      var thumb = p.image ? '<img class="plist-thumb" src="' + p.image + '" alt="" loading="lazy">' : '<div class="plist-thumb"></div>';
-      return '<div class="plist-item" onclick="openProduct(' + i + ')">'
-        + thumb
-        + '<div class="plist-info">'
-        + (p.category ? '<span class="ptag">' + p.category + '</span>' : '')
-        + '<h3>' + (p.name || '') + '</h3>'
-        + (meta.length ? '<div class="plist-meta">' + meta.join('') + '</div>' : '')
-        + '</div>'
-        + '<span class="plist-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
-        + '</div>';
-    }).join('');
+  function apply(items){
+    _products = items || []; _buildCats();
+    var dv=document.getElementById('detailView');
+    var detailOpen = dv && dv.classList.contains('open');
+    if(_curCat===-1 && !detailOpen) renderCategories();
     if (status) status.textContent = '';
   }
-  try { var c = JSON.parse(localStorage.getItem(CACHE) || 'null'); if (c && c.length) render(c); else if (status) status.textContent = 'Loading products\u2026'; } catch(e){ if (status) status.textContent = 'Loading\u2026'; }
+  try { var c = JSON.parse(localStorage.getItem(CACHE) || 'null'); if (c && c.length) apply(c); else if (status) status.textContent = 'Loading\u2026'; } catch(e){ if (status) status.textContent = 'Loading\u2026'; }
   fetch(api + '?action=products&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (d) {
       var items = (d && d.products) ? d.products : [];
-      if (items.length) { render(items); try { localStorage.setItem(CACHE, JSON.stringify(items)); } catch(e){} }
+      if (items.length) { apply(items); try { localStorage.setItem(CACHE, JSON.stringify(items)); } catch(e){} }
       else if (!_products.length) { if (status) status.textContent = 'Abhi koi product nahi.'; }
     })
     .catch(function () { if (!_products.length && status) status.textContent = 'Products load nahi hue \u2014 internet / URL check karo.'; });
+})();
+
+
+/* ---- category page: load this category's models from sheet ---- */
+(function(){
+  var box=document.getElementById('catModels'); if(!box) return;
+  var wrap=document.getElementById('catModelsWrap');
+  var status=document.getElementById('catModelsStatus');
+  var keys=(box.getAttribute('data-keys')||'').toLowerCase().split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var api=(window.MAC_CONFIG&&window.MAC_CONFIG.productsApi)||'';
+  function matches(cat){ cat=(cat||'').toLowerCase(); return keys.some(function(k){return k && cat.indexOf(k)>-1;}); }
+  function render(items){
+    _products=items||[];
+    var idxs=[]; _products.forEach(function(p,i){ if(matches(p.category)) idxs.push(i); });
+    if(!idxs.length){ if(wrap) wrap.style.display='none'; return; }
+    if(wrap) wrap.style.display='';
+    box.innerHTML=idxs.map(function(i){var p=_products[i];var meta=[];if(p.model)meta.push('<span class="pmeta">'+p.model+'</span>');if(p.capacity)meta.push('<span class="pmeta">'+p.capacity+'</span>');return '<div class="plist-item" onclick="openProduct('+i+')">'+_thumb(p.image)+'<div class="plist-info"><span class="ptag">'+(p.category||'')+'</span><h3>'+(p.name||'')+'</h3>'+(meta.length?'<div class="plist-meta">'+meta.join('')+'</div>':'')+'</div>'+_ARROW+'</div>';}).join('');
+    if(status) status.textContent='';
+  }
+  try{var c=JSON.parse(localStorage.getItem('macaqua_products_cache')||'null');if(c&&c.length)render(c);else if(status)status.textContent='Loading models\u2026';}catch(e){}
+  if(api) fetch(api+'?action=products&t='+Date.now()).then(function(r){return r.json();}).then(function(d){var items=(d&&d.products)?d.products:[];if(items.length){render(items);try{localStorage.setItem('macaqua_products_cache',JSON.stringify(items));}catch(e){}}}).catch(function(){});
 })();
 
 /* ---- footer year ---- */
